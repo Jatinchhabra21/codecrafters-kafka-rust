@@ -1,6 +1,6 @@
 #![allow(unused_imports)]
 use core::str;
-use std::{io::Write, net::{TcpListener, TcpStream}};
+use std::{collections::VecDeque, io::Write, net::{TcpListener, TcpStream}, vec};
 
 fn main() {
     println!("Logs from your program will appear here!");
@@ -26,12 +26,7 @@ fn main() {
 
 
 fn handle_connection(mut stream: &TcpStream) {
-    let response_size: u32 = 4; 
-    let response_header: u32 = 7;
-    let mut response: String = String::from("");
-    response.push_str(&response_size.to_string());
-    response.push_str(&response_header.to_string());
-    match stream.write_all(response.as_bytes()) {
+    match stream.write_all(&[0,0,0,4,0,0,0,7]) {
         Ok(()) => (),
         Err(_) => println!("Some error occured")
     }
