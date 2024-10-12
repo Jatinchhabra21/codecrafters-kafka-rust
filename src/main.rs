@@ -1,5 +1,5 @@
 #![allow(unused_imports)]
-use core::str;
+use std::str;
 use std::{
     collections::VecDeque,
     io::{Read, Write},
@@ -47,6 +47,11 @@ fn parse_bytes_to_uint(byte_array: &[u8]) -> usize {
     result
 }
 
+// debug show function
+fn show(bs: &[u8]) -> () {
+    println!("{}", String::from_utf8_lossy(bs).into_owned());
+}
+
 fn parse_request_headers(mut stream: &TcpStream) -> RequestHeader {
     let mut length: [u8; 4] = [0; 4];
     let mut request_api_key: [u8; 2] = [0; 2];
@@ -56,6 +61,11 @@ fn parse_request_headers(mut stream: &TcpStream) -> RequestHeader {
     stream.read_exact(&mut request_api_key);
     stream.read_exact(&mut request_api_version);
     stream.read_exact(&mut correlation_id);
+
+    show(&length);
+    show(&request_api_key);
+    show(&request_api_version);
+    show(&correlation_id);
 
     RequestHeader {
         request_api_key: parse_bytes_to_uint(&request_api_key) as u16,
