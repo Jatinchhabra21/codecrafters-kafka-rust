@@ -12,6 +12,10 @@ fn main() {
         match stream {
             Ok(mut _stream) => {
                 handle_connection(&_stream);
+                match _stream.shutdown(std::net::Shutdown::Both) {
+                    Ok(()) => (),
+                    Err(_) => println!("Some error occured when closing the connection")
+                }
             }
             Err(e) => {
                 println!("error: {}", e);
