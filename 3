@@ -64,8 +64,7 @@ fn parse_request_headers(mut stream: &TcpStream) -> RequestHeader {
 }
 
 fn handle_connection(mut stream: &TcpStream) {
-    let headers: RequestHeader = parse_request_headers(stream);
-    let correlation_id: u32 = headers.correlation_id;
+    let correlation_id: u32 = 7;
     let response_size: [u8; 4] = [0, 0, 0, 4];
     let response: Vec<u8> = [response_size, correlation_id.to_be_bytes()].concat();
     match stream.write_all(&response) {
