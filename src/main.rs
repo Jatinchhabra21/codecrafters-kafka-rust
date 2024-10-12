@@ -48,9 +48,11 @@ fn parse_bytes_to_uint(byte_array: &[u8]) -> usize {
 }
 
 fn parse_request_headers(mut stream: &TcpStream) -> RequestHeader {
+    let mut length: [u8; 4] = [0; 4];
     let mut request_api_key: [u8; 2] = [0; 2];
     let mut request_api_version: [u8; 2] = [0; 2];
     let mut correlation_id: [u8; 4] = [0; 4];
+    stream.read_exact(&mut length);
     stream.read_exact(&mut request_api_key);
     stream.read_exact(&mut request_api_version);
     stream.read_exact(&mut correlation_id);
