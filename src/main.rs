@@ -8,9 +8,9 @@ use std::{
 };
 
 struct RequestHeader {
-    request_api_key: u16,
-    request_api_version: u16,
-    correlation_id: u32,
+    request_api_key: i16,
+    request_api_version: i16,
+    correlation_id: i32,
     client_id: Option<String>,
 }
 
@@ -54,30 +54,26 @@ fn show(bs: &[u8]) -> () {
 
 fn parse_request_headers(mut stream: &TcpStream) -> RequestHeader {
     let mut length: [u8; 4] = [0; 4];
-    let mut request_api_key: [u8; 2] = [0; 2];
+    stream.read_exact(&mut length);
     let mut request_api_version: [u8; 2] = [0; 2];
     let mut correlation_id: [u8; 4] = [0; 4];
-    stream.read_exact(&mut length);
+    let mut request_api_key: [u8; 2] = [0; 2];
+
     stream.read_exact(&mut request_api_key);
     stream.read_exact(&mut request_api_version);
     stream.read_exact(&mut correlation_id);
 
-    show(&length);
-    show(&request_api_key);
-    show(&request_api_version);
-    show(&correlation_id);
-
     RequestHeader {
-        request_api_key: parse_bytes_to_uint(&request_api_key) as u16,
-        request_api_version: parse_bytes_to_uint(&request_api_version) as u16,
-        correlation_id: parse_bytes_to_uint(&correlation_id) as u32,
+        request_api_key: i16::from_be_bytes(request_api_key),
+        request_api_version: i16::from_be_bytes(request_api_version),
+        correlation_id: i32::from_be_bytes(correlation_id),
         client_id: None,
     }
 }
 
 fn handle_connection(mut stream: &TcpStream) {
     let headers: RequestHeader = parse_request_headers(stream);
-    let correlation_id: u32 = headers.correlation_id;
+    let correlation_id: i32 = headers.correlation_id;
     let response_size: [u8; 4] = [0, 0, 0, 4];
     let response: Vec<u8> = [response_size, correlation_id.to_be_bytes()].concat();
     match stream.write_all(&response) {
