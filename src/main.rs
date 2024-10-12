@@ -11,7 +11,7 @@ fn main() {
     for stream in listener.incoming() {
         match stream {
             Ok(mut _stream) => {
-                handle_connection(_stream);
+                handle_connection(&_stream);
             }
             Err(e) => {
                 println!("error: {}", e);
@@ -21,7 +21,7 @@ fn main() {
 }
 
 
-fn handle_connection(mut stream: TcpStream) -> TcpStream {
+fn handle_connection(mut stream: &TcpStream) {
     let response_size: u32 = 4; 
     let response_header: u32 = 7;
     let mut response: String = String::from("");
@@ -31,5 +31,4 @@ fn handle_connection(mut stream: TcpStream) -> TcpStream {
         Ok(()) => (),
         Err(_) => println!("Some error occured")
     }
-    stream
 }
