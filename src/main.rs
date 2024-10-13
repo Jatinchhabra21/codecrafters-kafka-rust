@@ -69,6 +69,7 @@ fn handle_connection(mut stream: &TcpStream) {
     let max_api_version: i16 = 4;
     let num_of_api_keys: i8 = 2;
     let tag_buffer_length: i8 = 0;
+    let throttle_time_ms: i32 = 0;
 
     // check if api version is invalid for ApiVersions request with key 18
     if headers.request_api_key == 18
@@ -84,5 +85,6 @@ fn handle_connection(mut stream: &TcpStream) {
     stream.write_all(&api_key.to_be_bytes());
     stream.write_all(&min_api_version.to_be_bytes());
     stream.write_all(&max_api_version.to_be_bytes());
+    stream.write_all(&throttle_time_ms.to_be_bytes());
     stream.write_all(&tag_buffer_length.to_be_bytes());
 }
