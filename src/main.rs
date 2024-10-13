@@ -40,8 +40,6 @@ fn parse_request_headers(mut stream: &TcpStream) -> RequestHeader {
     let mut length: [u8; 4] = [0; 4];
     stream.read_exact(&mut length);
 
-    println!("{:?}", length);
-
     // declare and initialize byte arrays for necessary fields
     let mut request_api_version: [u8; 2] = [0; 2];
     let mut correlation_id: [u8; 4] = [0; 4];
@@ -64,17 +62,15 @@ fn parse_request_headers(mut stream: &TcpStream) -> RequestHeader {
 fn handle_connection(mut stream: &TcpStream) {
     let headers: RequestHeader = parse_request_headers(stream);
     let correlation_id: i32 = headers.correlation_id;
-    let mut size: i32 = 4;
+    let mut size: i32 = 6;
     let mut error_code: i16 = 0;
 
     // check if api version is invalid
     if (headers.request_api_version < 0 || headers.request_api_version > 4) {
-        size += 2;
         error_code = 35;
     }
 
     stream.write_all(&size.to_be_bytes()); // size of resposne
     stream.write_all(&correlation_id.to_be_bytes()); // correlation id as bytes in big endian
-    println!("{:?}", &error_code.to_be_bytes());
     stream.write_all(&error_code.to_be_bytes()); // error code as bytes in big endian
 }
