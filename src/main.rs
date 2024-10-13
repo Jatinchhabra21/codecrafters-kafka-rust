@@ -66,7 +66,7 @@ fn handle_connection(mut stream: &TcpStream) {
     let mut error_code: i16 = 0;
     let api_key: i16 = headers.request_api_key;
     let min_api_version: i16 = 0;
-    let max_api_version: i16 = 0;
+    let max_api_version: i16 = 4;
     let num_of_api_keys: i8 = 2;
 
     // check if api version is invalid
