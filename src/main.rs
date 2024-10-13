@@ -61,7 +61,7 @@ fn parse_request_headers(mut stream: &TcpStream) -> RequestHeader {
 
 fn handle_connection(mut stream: &TcpStream) {
     let headers: RequestHeader = parse_request_headers(stream);
-    let size: i32 = 21;
+    let size: i32 = 19;
     let correlation_id: i32 = headers.correlation_id;
     let mut error_code: i16 = 0;
     let num_of_api_keys: i8 = 2;
@@ -69,7 +69,7 @@ fn handle_connection(mut stream: &TcpStream) {
     let min_api_version: i16 = 0;
     let max_api_version: i16 = 4;
     let throttle_time_ms: i32 = 0;
-    let tag_buffer_length: i32 = 0;
+    let tag_buffer_length: i16 = 0;
 
     // check if api version is invalid for ApiVersions request with key 18
     if headers.request_api_key == 18
