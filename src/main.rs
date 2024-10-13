@@ -75,5 +75,6 @@ fn handle_connection(mut stream: &TcpStream) {
 
     stream.write_all(&size.to_be_bytes()); // size of resposne
     stream.write_all(&correlation_id.to_be_bytes()); // correlation id as bytes in big endian
+    println!("{:?}", &error_code.to_be_bytes());
     stream.write_all(&error_code.to_be_bytes()); // error code as bytes in big endian
 }
