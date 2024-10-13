@@ -62,7 +62,7 @@ fn parse_request_headers(mut stream: &TcpStream) -> RequestHeader {
 fn handle_connection(mut stream: &TcpStream) {
     let headers: RequestHeader = parse_request_headers(stream);
     let correlation_id: i32 = headers.correlation_id;
-    let mut size: i32 = 13;
+    let mut size: i32 = 9;
     let mut error_code: i16 = 0;
     let api_key: i16 = headers.request_api_key;
     let min_api_version: i16 = 0;
@@ -78,7 +78,4 @@ fn handle_connection(mut stream: &TcpStream) {
     stream.write_all(&correlation_id.to_be_bytes()); // correlation id as bytes in big endian
     stream.write_all(&error_code.to_be_bytes()); // error code as bytes in big endian
     stream.write_all(&num_of_api_keys.to_be_bytes());
-    stream.write_all(&api_key.to_be_bytes());
-    stream.write_all(&min_api_version.to_be_bytes());
-    stream.write_all(&max_api_version.to_be_bytes());
 }
