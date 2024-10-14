@@ -31,9 +31,7 @@ fn main() {
 }
 
 fn handle_connection(mut stream: &TcpStream) {
-    let mut request_bytes: Vec<u8> = Vec::new();
-    stream.read_to_end(&mut request_bytes).unwrap();
-    let headers: RequestHeader = RequestHeader::new(&request_bytes);
+    let headers: RequestHeader = RequestHeader::new(stream);
     let size: i32 = 19;
     let correlation_id: i32 = headers.correlation_id;
     let mut error_code: i16 = 0;
