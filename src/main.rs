@@ -32,15 +32,18 @@ fn main() {
 
 fn handle_connection(mut stream: &TcpStream) {
     println!("in handle_connection fn");
-    let mut header_bytes: Vec<u8> = Vec::new();
 
-    match stream.read_to_end(&mut header_bytes) {
-        Ok(_) => (),
-        Err(error) => println!("Something went wrong! {:?}", error),
-    }
+    let mut bytes = stream.take(4);
 
-    println!("header bytes: {:?}", header_bytes);
-    let headers: RequestHeader = RequestHeader::new(header_bytes);
+    let mut size: [u8; 4] = [0; 4];
+    bytes.read_exact(&mut size).unwrap();
+
+    let mut request_bytes: Vec<u8> = Vec::with_capacity(u32::from_be_bytes(size) as usize);
+
+    stream.read_exact(&mut request_bytes).unwrap();
+
+    println!("size bytes: {:?}\n header bytes: {:?}", size, request_bytes);
+    let headers: RequestHeader = RequestHeader::new(request_bytes);
     let size: i32 = 19;
     let correlation_id: i32 = headers.correlation_id;
     let mut error_code: i16 = 0;

@@ -10,7 +10,7 @@ pub struct RequestHeader {
 
 impl RequestHeader {
     pub fn new(bytes: Vec<u8>) -> RequestHeader {
-        let mut size: [u8; 4] = [0; 4];
+        // let mut size: [u8; 4] = [0; 4];
         let mut request_api_key: [u8; 2] = [0; 2];
         let mut request_api_version: [u8; 2] = [0; 2];
         let mut correlation_id: [u8; 4] = [0; 4];
@@ -19,7 +19,7 @@ impl RequestHeader {
 
         let mut reader = bytes.reader();
 
-        reader.read_exact(&mut size).unwrap();
+        // reader.read_exact(&mut size).unwrap();
         reader.read_exact(&mut request_api_key).unwrap();
         reader.read_exact(&mut request_api_version).unwrap();
         reader.read_exact(&mut correlation_id).unwrap();
