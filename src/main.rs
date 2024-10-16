@@ -38,9 +38,11 @@ fn handle_connection(mut stream: &TcpStream) {
     let mut size: [u8; 4] = [0; 4];
     bytes.read_exact(&mut size).unwrap();
 
+    let mut header_reader = stream.take(u32::from_be_bytes(size) as u64);
+
     let mut request_bytes: Vec<u8> = Vec::with_capacity(u32::from_be_bytes(size) as usize);
 
-    stream.read_exact(&mut request_bytes).unwrap();
+    header_reader.read_exact(&mut request_bytes).unwrap();
 
     println!("size bytes: {:?}\n header bytes: {:?}", size, request_bytes);
     let headers: RequestHeader = RequestHeader::new(request_bytes);
