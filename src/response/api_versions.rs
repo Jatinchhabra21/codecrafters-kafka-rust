@@ -3,7 +3,7 @@ use super::constants::{
 };
 use crate::RequestHeader;
 
-pub struct ResponseBody<'a> {
+pub struct ApiVersions<'a> {
     size: i32,
     correlation_id: i32,
     error_code: i16,
@@ -19,8 +19,8 @@ struct ApiKey {
     max_api_version: i16,
 }
 
-impl<'a> ResponseBody<'a> {
-    pub fn new(header: &RequestHeader) -> ResponseBody {
+impl<'a> ApiVersions<'a> {
+    pub fn new(header: &RequestHeader) -> ApiVersions {
         let mut size: i32 = 13;
         let tag_buffer_len: i16 = 0;
         let num_of_keys: i8 = 2;
@@ -40,7 +40,7 @@ impl<'a> ResponseBody<'a> {
             max_api_version: API_VERSIONS_MAX_API_VERSION,
         }];
 
-        let response = ResponseBody {
+        let response = ApiVersions {
             size,
             correlation_id: header.correlation_id,
             num_of_keys,

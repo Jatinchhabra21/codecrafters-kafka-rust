@@ -1,4 +1,5 @@
 #![allow(unused_imports)]
+use std::env::args;
 use std::fmt::write;
 use std::str;
 use std::{
@@ -8,7 +9,8 @@ use std::{
     vec,
 };
 
-use kafka_starter_rust::api_versions::ResponseBody;
+use kafka_starter_rust::api_versions::ApiVersions;
+use kafka_starter_rust::constants::API_VERSIONS_REQUEST_API_KEY;
 use kafka_starter_rust::RequestHeader;
 
 fn main() {
@@ -19,10 +21,8 @@ fn main() {
     for stream in listener.incoming() {
         match stream {
             Ok(mut _stream) => {
-                handle_connection(&_stream);
-                match _stream.shutdown(std::net::Shutdown::Both) {
-                    Ok(_) => (),
-                    Err(_) => println!("Some error occured when closing the connection"),
+                while _stream.peek(&mut [0; 1]).is_ok() {
+                    handle_connection(&_stream);
                 }
             }
             Err(e) => {
@@ -47,9 +47,15 @@ fn handle_connection(mut stream: &TcpStream) {
 
     let headers: RequestHeader = RequestHeader::new(request_bytes);
 
-    let response: ResponseBody = ResponseBody::new(&headers);
+    let mut res_bytes: Vec<u8> = vec![0];
 
-    let res_bytes: Vec<u8> = response.serialize_to_bytes();
+    match headers.request_api_key {
+        API_VERSIONS_REQUEST_API_KEY => {
+            let response: ApiVersions = ApiVersions::new(&headers);
+            res_bytes = response.serialize_to_bytes();
+        }
+        _ => println!("[DEBUG]: This type of request is not available yet."),
+    }
 
     stream
         .write_all(&res_bytes)
