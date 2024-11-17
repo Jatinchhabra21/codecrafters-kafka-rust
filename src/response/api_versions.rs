@@ -10,13 +10,13 @@ pub struct ApiVersions<'a> {
     error_code: i16,
     api_keys: &'a [ApiKey],
     throttle_time_ms: i32,
-    tag_buffer_len: i16,
+    tag_buffer_len: i8,
 }
 
 impl<'a> ApiVersions<'a> {
     pub fn new(header: &RequestHeader) -> ApiVersions {
-        let mut size: i32 = 13;
-        let tag_buffer_len: i16 = 0;
+        let mut size: i32 = 12;
+        let tag_buffer_len: i8 = 0;
         let mut error_code: i16 = 0;
 
         if header.request_api_version < API_VERSIONS_MIN_API_VERSION
@@ -25,7 +25,7 @@ impl<'a> ApiVersions<'a> {
             error_code = ErrorCode::UnsupportedVersion as i16;
         }
 
-        size += (SUPPORTED_API.len() * 6) as i32;
+        size += (SUPPORTED_API.len() * 7) as i32;
 
         let response = ApiVersions {
             size,
@@ -51,9 +51,9 @@ impl<'a> ApiVersions<'a> {
             serialized_response.extend_from_slice(&(key.api_key).to_be_bytes());
             serialized_response.extend_from_slice(&(key.min_api_version).to_be_bytes());
             serialized_response.extend_from_slice(&(key.max_api_version).to_be_bytes());
+            serialized_response.extend_from_slice(&(self.tag_buffer_len).to_be_bytes());
         }
 
-        serialized_response.extend_from_slice(&(self.tag_buffer_len).to_be_bytes());
         serialized_response.extend_from_slice(&(self.throttle_time_ms).to_be_bytes());
 
         serialized_response
