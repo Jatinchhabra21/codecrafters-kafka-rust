@@ -1,13 +1,13 @@
 #![allow(unused_imports)]
 use std::env::args;
 use std::fmt::write;
-use std::str;
 use std::{
     collections::VecDeque,
     io::{Read, Write},
     net::{TcpListener, TcpStream},
     vec,
 };
+use std::{str, thread};
 
 use kafka_starter_rust::api_versions::ApiVersions;
 use kafka_starter_rust::constants::API_VERSIONS_REQUEST_API_KEY;
@@ -21,9 +21,11 @@ fn main() {
     for stream in listener.incoming() {
         match stream {
             Ok(mut _stream) => {
-                while _stream.peek(&mut [0; 1]).is_ok() {
-                    handle_connection(&_stream);
-                }
+                thread::spawn(move || {
+                    while _stream.peek(&mut [0; 1]).is_ok() {
+                        handle_connection(&_stream);
+                    }
+                });
             }
             Err(e) => {
                 println!("error: {}", e);
@@ -33,16 +35,15 @@ fn main() {
 }
 
 fn handle_connection(mut stream: &TcpStream) {
-    let mut size: [u8; 4] = [0; 4];
-
+    let mut size = [0; 4];
     stream
         .read_exact(&mut size)
-        .expect("Failed to read icoming request");
+        .expect("Failed to read incoming request");
 
-    let mut request_bytes: Vec<u8> = vec![0; u32::from_be_bytes(size) as usize];
+    let mut request_bytes: Vec<u8> = vec![0; i32::from_be_bytes(size) as usize];
 
     stream
-        .read(&mut request_bytes)
+        .read_exact(&mut request_bytes)
         .expect("Unable to read request body");
 
     let headers: RequestHeader = RequestHeader::new(request_bytes);

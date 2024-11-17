@@ -1,53 +1,39 @@
 use super::constants::{
-    API_VERSIONS_MAX_API_VERSION, API_VERSIONS_MIN_API_VERSION, API_VERSIONS_REQUEST_API_KEY,
+    ErrorCode, API_VERSIONS_MAX_API_VERSION, API_VERSIONS_MIN_API_VERSION, SUPPORTED_API,
 };
+use super::ApiKey;
 use crate::RequestHeader;
 
 pub struct ApiVersions<'a> {
     size: i32,
     correlation_id: i32,
     error_code: i16,
-    num_of_keys: i8,
     api_keys: &'a [ApiKey],
     throttle_time_ms: i32,
     tag_buffer_len: i16,
-}
-
-struct ApiKey {
-    api_key: i16,
-    min_api_version: i16,
-    max_api_version: i16,
 }
 
 impl<'a> ApiVersions<'a> {
     pub fn new(header: &RequestHeader) -> ApiVersions {
         let mut size: i32 = 13;
         let tag_buffer_len: i16 = 0;
-        let num_of_keys: i8 = 2;
         let mut error_code: i16 = 0;
-
-        size += ((num_of_keys - 1) * 6) as i32;
 
         if header.request_api_version < API_VERSIONS_MIN_API_VERSION
             || header.request_api_version > API_VERSIONS_MAX_API_VERSION
         {
-            error_code = 35;
+            error_code = ErrorCode::UnsupportedVersion as i16;
         }
 
-        let api_keys: &[ApiKey; 1] = &[ApiKey {
-            api_key: API_VERSIONS_REQUEST_API_KEY,
-            min_api_version: API_VERSIONS_MIN_API_VERSION,
-            max_api_version: API_VERSIONS_MAX_API_VERSION,
-        }];
+        size += (SUPPORTED_API.len() * 6) as i32;
 
         let response = ApiVersions {
             size,
             correlation_id: header.correlation_id,
-            num_of_keys,
             tag_buffer_len,
             error_code,
             throttle_time_ms: 0,
-            api_keys,
+            api_keys: SUPPORTED_API,
         };
 
         response
@@ -59,7 +45,7 @@ impl<'a> ApiVersions<'a> {
         serialized_response.extend_from_slice(&(self.size).to_be_bytes());
         serialized_response.extend_from_slice(&(self.correlation_id).to_be_bytes());
         serialized_response.extend_from_slice(&(self.error_code).to_be_bytes());
-        serialized_response.extend_from_slice(&(self.num_of_keys).to_be_bytes());
+        serialized_response.extend_from_slice(&((self.api_keys.len() + 1) as i8).to_be_bytes());
 
         for key in self.api_keys {
             serialized_response.extend_from_slice(&(key.api_key).to_be_bytes());
