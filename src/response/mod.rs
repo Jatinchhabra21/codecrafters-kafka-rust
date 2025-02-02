@@ -1,5 +1,6 @@
 pub mod api_versions;
 pub mod constants;
+pub mod fetch;
 
 pub struct ApiKey {
     pub api_key: i16,
