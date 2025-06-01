@@ -36,6 +36,8 @@ impl<'a> ApiVersions<'a> {
             api_keys: SUPPORTED_API,
         };
 
+        println!("[DEBUG]: Size of Response {:?}", size);
+
         response
     }
 
@@ -55,6 +57,7 @@ impl<'a> ApiVersions<'a> {
         }
 
         serialized_response.extend_from_slice(&(self.throttle_time_ms).to_be_bytes());
+        serialized_response.extend_from_slice(&(self.tag_buffer_len).to_be_bytes());
 
         serialized_response
     }
